@@ -1,5 +1,5 @@
 const request = require('supertest');
-const Server = require('../models/server');
+const Server = require('../../server');
 jest.mock('../models/Usuario', () => ({
   create: jest.fn(),
   findAll: jest.fn(),

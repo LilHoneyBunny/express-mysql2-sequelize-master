@@ -3,6 +3,20 @@ const bcrypt = require('bcryptjs');
 const authService = require('../Services/AuthService'); // 👈 nuevo
 
 // Validación básica de datos de entrada
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Usuario:
+ *       type: object
+ *       properties:
+ *         nombre:
+ *           type: string
+ *         email:
+ *           type: string
+ *         pass:
+ *           type: string
+ */
 const validarUsuarioInput = (data, { parcial = false } = {}) => {
   const errores = [];
 
@@ -33,6 +47,24 @@ const validarUsuarioInput = (data, { parcial = false } = {}) => {
 };
 
 // POST /api/usuarios/register
+/**
+ * @swagger
+ * /api/usuarios/register:
+ *   post:
+ *     summary: Crear un nuevo usuario
+ *     description: Crea un nuevo usuario en el sistema
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Usuario'
+ *     responses:
+ *       201:
+ *         description: Usuario creado exitosamente
+ *       400:
+ *         description: Error de validación
+ */
 const crearUsuario = async (req, res) => {
   const errores = validarUsuarioInput(req.body);
   if (errores.length > 0) {
@@ -69,6 +101,29 @@ const crearUsuario = async (req, res) => {
 };
 
 // POST /api/usuarios/login
+/**
+ * @swagger
+ * /api/usuarios/login:
+ *   post:
+ *     summary: Login de usuario
+ *     description: Permite iniciar sesión usando email y contraseña
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               pass:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login exitoso, se devuelve el token
+ *       400:
+ *         description: Error en las credenciales
+ */
 const login = async (req, res) => {
   const { email, pass } = req.body;
 
@@ -111,6 +166,16 @@ const login = async (req, res) => {
 };
 
 // GET /api/usuarios  (protegido con JWT)
+/**
+ * @swagger
+ * /api/usuarios:
+ *   get:
+ *     summary: Obtener la lista de usuarios
+ *     description: Obtiene todos los usuarios registrados (sin mostrar las contraseñas)
+ *     responses:
+ *       200:
+ *         description: Lista de usuarios
+ */
 const obtenerUsuarios = async (req, res) => {
   const usuarios = await Usuario.findAll({
     attributes: { exclude: ['pass'] } // no mostrar la contraseña
@@ -119,6 +184,38 @@ const obtenerUsuarios = async (req, res) => {
 };
 
 // PUT /api/usuarios/:id  (protegido con JWT)
+/**
+ * @swagger
+ * /api/usuarios/{id}:
+ *   put:
+ *     summary: Actualizar datos de un usuario
+ *     description: Permite actualizar la información de un usuario
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID del usuario a actualizar
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               pass:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Usuario actualizado exitosamente
+ *       400:
+ *         description: Error al actualizar el usuario
+ *       404:
+ *         description: Usuario no encontrado
+ */
 const actualizarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
@@ -144,6 +241,23 @@ const actualizarUsuario = async (req, res) => {
 };
 
 // DELETE /api/usuarios/:id  (protegido con JWT)
+/**
+ * @swagger
+ * /api/usuarios/{id}:
+ *   delete:
+ *     summary: Eliminar un usuario
+ *     description: Elimina un usuario del sistema por su ID
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID del usuario a eliminar
+ *     responses:
+ *       200:
+ *         description: Usuario eliminado exitosamente
+ *       404:
+ *         description: Usuario no encontrado
+ */
 const eliminarUsuario = async (req, res) => {
   try {
     const { id } = req.params;
